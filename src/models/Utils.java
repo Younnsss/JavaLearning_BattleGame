@@ -1,6 +1,7 @@
 package models;
 import java.util.Arrays;
 //import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -15,7 +16,9 @@ public class Utils {
 	
 	private final static int REFERENCE_DEGAT = 10;
 	
-	public static void attaquer(Combattant etu1, Combattant etu2) {
+	public static void attaquer(Combattant c, List<Combattant> l1, List<Combattant> l2) {
+		Combattant etu1=c;
+		Combattant etu2=l1.get(0);
         if (Math.round(Math.random() * 100) <= 40 + 3 * etu1.getDexterite()) {
             // * Attaque reussie
             double coefficientDegat = Math.max(0, Math.min(100, 10 * etu1.getForce() - 5 * etu2.getResistance()));
@@ -26,7 +29,9 @@ public class Utils {
         }
     }
 
-    public static void soigner(Combattant etu1, Combattant etu2) {
+    public static void soigner(Combattant c, List<Combattant> l1, List<Combattant> l2) {
+		Combattant etu1=c;
+		Combattant etu2=l1.get(0);
         if (Math.round(Math.random() * 100) <= 20 + 6 * etu1.getDexterite()) {
             // * soin réussi
             etu2.recevoirSoin((int) Math.min(30+etu2.getConstitution(),Math.ceil(Math.random() * 0.6 * (10 + etu2.getConstitution()))));
