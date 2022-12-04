@@ -16,7 +16,7 @@ public class Combattant implements Comparable<Combattant>{
 
     private int initiative;
 
-    private Strategie strategie;
+    public Strategie strategie;
 
     private Role role;
     
@@ -48,9 +48,18 @@ public class Combattant implements Comparable<Combattant>{
         return this.strategie;
     }
 
-    void setStrategie(Strategie value) {
-        // Automatically generated method. Please delete this comment before entering specific code.
-        this.strategie = value;
+    void setStrategie(String stra) {
+		switch (stra) {
+			case "a":
+				this.strategie = new Offensive();
+				break;
+			case "s":
+				this.strategie = new Defensive();
+				break;
+			default:
+				this.strategie = new Aleatoire();
+				break;
+		}
     }
 
     Role getRole() {
@@ -124,7 +133,7 @@ public class Combattant implements Comparable<Combattant>{
     }
     
     public int[] getStats() {
-		int stats[] = {this.dexterite,this.force,this.resistance,this.constitution,this.initiative};
+		int stats[] = {this.dexterite,this.force,this.resistance,this.constitution,this.initiative, this.creditECTS};
 		return stats;
 	}
     
@@ -139,11 +148,15 @@ public class Combattant implements Comparable<Combattant>{
     }
     
     public void recevoirDegats(int degats) {
+		System.out.println("points : " + degats);
         this.creditECTS = Math.max(0, this.creditECTS - degats);
+		System.out.println("Il reste " + this.creditECTS + " ECTS au combattant");
     }
 
     public void recevoirSoin(int soin) {
-        this.creditECTS=Math.min(30,this.creditECTS + soin);
+		System.out.println("points : " + soin);
+		this.creditECTS=Math.min(30,this.creditECTS + soin);
+		System.out.println("Il reste " + this.creditECTS + " ECTS au combattant");
     }
     
     
@@ -160,7 +173,7 @@ public class Combattant implements Comparable<Combattant>{
 		if(nbCombattant==0) {r=Role.maitreGobi;}
 		else if(nbCombattant<5) {r=Role.elite;}
 		else {r=Role.basique;}
-		
+		String[] s = {"a", "h", "r"};
     	int[] stats = r.getStats();
     	int random;
     	int max;
@@ -172,7 +185,7 @@ public class Combattant implements Comparable<Combattant>{
 	    	player.setCreditECTS(player.getCreditECTS()-random);
 		}
     	Combattant warrior = new Combattant(stats[0], stats[1], stats[2], 
-    			stats[3], stats[4], "r", r);
+    			stats[3], stats[4], s[(int) (Math.random() * 3)] , r);
     	return warrior;
     }
      

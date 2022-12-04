@@ -16,30 +16,52 @@ public class Utils {
 	
 	private final static int REFERENCE_DEGAT = 10;
 	
-	public static void attaquer(Combattant c, List<Combattant> l1, List<Combattant> l2) {
-		Combattant etu1=c;
-		Combattant etu2=l1.get(0);
-        if (Math.round(Math.random() * 100) <= 40 + 3 * etu1.getDexterite()) {
-            // * Attaque reussie
-            double coefficientDegat = Math.max(0, Math.min(100, 10 * etu1.getForce() - 5 * etu2.getResistance()));
-            etu2.recevoirDegats((int) Math.ceil(Math.random() * (1 + coefficientDegat) * REFERENCE_DEGAT));
-        } else {
-            // * attaque rate
-        	System.out.println("L'attaque rate");
-        }
+	public static void attack(Combattant comb, List<Combattant> allies, List<Combattant> enemies) {
+		if(enemies.size()==0){
+			System.out.println("Il n'y a plus d'ennemis");
+		}
+		else {
+			Combattant target = enemies.get(getTarget(enemies));
+			System.out.println(Arrays.toString(comb.getStats()) + " attaque" + Arrays.toString(target.getStats()));
+			if (Math.round(Math.random() * 100) <= 40 + 3 * comb.getDexterite()) {
+				// * Attaque reussie
+				double coefficientDegat = Math.max(0, Math.min(100, 10 * comb.getForce() - 5 * target.getResistance())) / 100;
+				target.recevoirDegats((int) Math.ceil(Math.random() * (1 + coefficientDegat) * REFERENCE_DEGAT));
+				if (target.getCreditECTS() == 0) {
+					enemies.remove(target);
+				}
+			} else {
+				// * attaque rate
+				System.out.println("L'attaque rate");
+			}
+		}
     }
 
-    public static void soigner(Combattant c, List<Combattant> l1, List<Combattant> l2) {
-		Combattant etu1=c;
-		Combattant etu2=l1.get(0);
-        if (Math.round(Math.random() * 100) <= 20 + 6 * etu1.getDexterite()) {
+    public static void heal(Combattant comb, List<Combattant> allies, List<Combattant> enemies) {
+		Combattant target = allies.get(getTarget(allies));
+		System.out.println(Arrays.toString(comb.getStats()) + " soigne" + Arrays.toString(target.getStats()));
+        if (Math.round(Math.random() * 100) <= 20 + 6 * comb.getDexterite()) {
             // * soin réussi
-            etu2.recevoirSoin((int) Math.min(30+etu2.getConstitution(),Math.ceil(Math.random() * 0.6 * (10 + etu2.getConstitution()))));
+            target.recevoirSoin((int) Math.min(30+target.getConstitution(),Math.ceil(Math.random() * 0.6 * (10 + target.getConstitution()))));
         } else {
             // * soin rater
         	System.out.println("Le soin rate");
         }
     }
+
+
+	public static int getTarget(List<Combattant> combattants) {
+		int min = combattants.get(0).getCreditECTS();
+		int index = 0;
+		for (int i = 1; i < combattants.size(); i++) {
+			if (combattants.get(i).getCreditECTS() < min) {
+				min = combattants.get(i).getCreditECTS();
+				index = i;
+			}
+		}
+		return index;
+	}
+
 	
 	
 	/*
@@ -215,6 +237,43 @@ public class Utils {
    		System.out.println("c'est good !");
    		return false;
     }
+
+	static int[] getInput(int nbZone, int nbComb) {
+
+		String[] input;
+		int[] intInput;
+		do {
+			input = scan.nextLine().split("/");
+		} while (checkInput(input, nbZone, nbComb));
+		intInput = Arrays.asList(input).stream().mapToInt(Integer::parseInt).toArray();
+		Arrays.sort(intInput);
+		return intInput;
+	}
+
+	static boolean checkInput(String[] input, int nbZone, int nbComb) {
+		int nbCombLeft = nbComb - input.length;
+		if(input.length == 0 | nbZone>nbCombLeft) {
+			System.out.println("Attention : Il faut au minimum un combattant dans chaque Zone");
+			return true;
+		}else {
+			for (int i = 0; i < input.length; i++) {
+				if(!Arrays.asList(checkComb).contains(input[i])) {
+					System.out.println("Attention : Veuillez saisir des chiffres/nombres compris entre 1 et "+ (nbComb));
+					return true;
+				}
+				if(Integer.parseInt(input[i])-1>nbComb) {
+					return true;
+				}
+			}
+
+		}
+		if(nbZone==0 && input.length!=nbComb) {
+			System.out.println("Attention : Il faut déployer l'ensemble des combattants !");
+			return true;
+		}
+		System.out.println("c'est good !");
+		return false;
+	}
     
 	
 }

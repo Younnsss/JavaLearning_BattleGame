@@ -61,9 +61,33 @@ public class Main {
     	
     	Utils.broadcast("------------------------- COMBAT -------------------------");
     	for (int i = 0; i < game.getZones().length; i++) {
+
+
 			Zone zone = game.getZone(game.chooseZone());
 			Utils.broadcast("--------------- Zone de combat "+ (i+1)+ " : " +zone.getName() +" ---------------");
 			zone.combat();
+			Utils.broadcast("------------------------- FIN COMBAT : "+zone.getName()+" -------------------------");
+			if(zone.combattantP1.size() == 0) {
+				zone.setWinner(game.getPlayers()[1]);
+			} else {
+				zone.setWinner(game.getPlayers()[0]);
+			}
+			Utils.broadcast("---------- "+ zone.getWinner().getPseudo() +" a gagné la Bataille ! ----------");
+
+
+			if(i < game.getZones().length-1 ) {
+
+				Utils.broadcast("------------------- REDEPLOIEMENT DE TROUPES -------------------");
+				for (int j = 1; j < 3; j++) {
+					Utils.broadcast("---------- "+ game.getPlayers()[j-1].getPseudo() +" ----------");
+					Utils.broadcast(" Deploiement des survivants : ");
+					game.redeploy(zone, zone.getWinner(), j);
+					Utils.broadcast(" Deploiement des reservistes : ");
+					game.depRes(j);
+				}
+
+			}
+
 		}
     	
         

@@ -6,12 +6,12 @@ public class Aleatoire implements Strategie {
 
 
     @Override
-    public void action(Combattant c, List<Combattant> l1, List<Combattant> l2) {
+    public void action(Combattant comb, List<Combattant> allies, List<Combattant> enemies) {
         
         if (Math.round(Math.random() * 1000) >= 500) {
-            Utils.attaquer(c,l1,l2);
+            Utils.attack(comb,allies,enemies);
         } else {
-            Utils.soigner(c,l1,l2);
+            Utils.heal(comb,allies,enemies);
         }
     }
 
