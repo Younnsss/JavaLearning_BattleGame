@@ -4,6 +4,8 @@ import models.Partie;
 import models.Utils;
 import models.Zone;
 
+import java.util.List;
+
 public class Main {
 	
 	private static Partie game = new Partie();
@@ -78,12 +80,13 @@ public class Main {
 			if(i < game.getZones().length-1 ) {
 
 				Utils.broadcast("------------------- REDEPLOIEMENT DE TROUPES -------------------");
+				List<Zone> destZones = game.getDestZones();
 				for (int j = 1; j < 3; j++) {
 					Utils.broadcast("---------- "+ game.getPlayers()[j-1].getPseudo() +" ----------");
 					Utils.broadcast(" Deploiement des survivants : ");
-					game.redeploy(zone, zone.getWinner(), j);
+					game.redeploy(zone,destZones, j);
 					Utils.broadcast(" Deploiement des reservistes : ");
-					game.depRes(j);
+					game.depRes(j,destZones);
 				}
 
 			}

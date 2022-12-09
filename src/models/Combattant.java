@@ -51,12 +51,15 @@ public class Combattant implements Comparable<Combattant>{
     void setStrategie(String stra) {
 		switch (stra) {
 			case "a":
+				System.out.println("oFFENSIVE");
 				this.strategie = new Offensive();
 				break;
 			case "s":
+				System.out.println("Defensive");
 				this.strategie = new Defensive();
 				break;
 			default:
+				System.out.println("Aleatoire");
 				this.strategie = new Aleatoire();
 				break;
 		}

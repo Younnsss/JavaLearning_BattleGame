@@ -20,6 +20,22 @@ public class Partie {
         return this.players;
     }
 
+    public List<Zone> getDestZones() {
+        List<Zone> destZones = new ArrayList<Zone>();
+        int cpt = 1;
+        for (Zone z : this.zones) {
+            if (z.getIsFinish() == null) {
+                Utils.broadcast("----- Zone de combat " + cpt + " :" + z.getName() + " -----");
+                Combattant.affComb(z.combattantP1);
+                System.out.println();
+                Combattant.affComb(z.combattantP2);
+                destZones.add(z);
+                cpt++;
+            }
+        }
+        return destZones;
+    }
+
     /*
      * This function initialize the fives zones found in the game.
      * The function takes as an input a list of names of the different zones.
@@ -146,64 +162,45 @@ public class Partie {
         }
     }
 
-    public void depRes(int nbPlayer) {
+    public void depRes(int nbPlayer, List<Zone> destZones) {
 
-        List<Zone> zones = new ArrayList<Zone>();
-        for (Zone z : this.zones) {
-            if (z.getIsFinish() == null) {
-                zones.add(z);
-            }
-        }
-
-        for (Zone zone : zones) {
+        for (Zone zone : destZones) {
 
             int[] intInput;
 
-            System.out.println("Zone :" + zone.getName());
-            System.out.println("Choisir parmi ces combattants :");
-            Combattant.affComb(this.players[nbPlayer - 1].getReserviste());
-            System.out.println("Deployer ? (o/n)");
-            String t = Utils.scan.nextLine();
-            if (t.equals("o")) {
 
+            System.out.println("Zone :" + zone.getName());
+            if (this.players[nbPlayer - 1].getReserviste().size() == 0) {
+                System.out.println("Vous n'avez plus de réservistes");
+            } else {
+                System.out.println("Choisir parmi ces combattants :");
+                Combattant.affComb(this.players[nbPlayer - 1].getReserviste());
+                System.out.println("Deployer ? (n/ [1/2/...])");
                 String[] input = Utils.scan.nextLine().split("/");
-                intInput = Arrays.asList(input).stream().mapToInt(Integer::parseInt).toArray();
-                Arrays.sort(intInput);
-                List<Combattant> combattants = new ArrayList<Combattant>();
-                for (int j = 0; j < intInput.length; j++) {
-                    if (intInput[j] != 0) {
+                if (!input[0].equals("n")) {
+                    intInput = Arrays.asList(input).stream().mapToInt(Integer::parseInt).toArray();
+                    Arrays.sort(intInput);
+                    List<Combattant> combattants = new ArrayList<Combattant>();
+                    for (int j = 0; j < intInput.length; j++) {
                         combattants.add(this.players[nbPlayer - 1].getReserviste().get(intInput[j] - 1 - j));
                         this.players[nbPlayer - 1].getReserviste().remove(intInput[j] - 1 - j);
                     }
+                    if (nbPlayer == 1) {
+                        zone.combattantP1.addAll(combattants);
+                    } else {
+                        zone.combattantP2.addAll(combattants);
+                    }
                 }
-                if (nbPlayer == 1) {
-                    zone.combattantP1.addAll(combattants);
-                } else {
-                    zone.combattantP2.addAll(combattants);
-                }
-            }
 
+            }
         }
     }
 
 
-    public void redeploy(Zone zone, Player player, int NbPlayer) {
+    public void redeploy(Zone zone, List<Zone> destZones, int NbPlayer) {
         List<Combattant> survivors;
-        List<Zone> zones = new ArrayList<Zone>();
-        int cpt = 1;
 
         if (NbPlayer == 1 && zone.getCombattantP1().size() > 0 || NbPlayer == 2 && zone.getCombattantP2().size() > 0) {
-
-            for (Zone z : this.zones) {
-                if (z.getIsFinish() == null) {
-                    Utils.broadcast("----- Zone de combat " + cpt + " :" + z.getName() + " -----");
-                    Combattant.affComb(z.combattantP1);
-                    System.out.println();
-                    Combattant.affComb(z.combattantP2);
-                    zones.add(z);
-                    cpt++;
-                }
-            }
 
             if (NbPlayer == 1) {
                 survivors = zone.combattantP1;
@@ -211,21 +208,28 @@ public class Partie {
                 survivors = zone.combattantP2;
             }
 
-            int cpt2=0;
-            for (int j = 0; j < survivors.size()+cpt2; j++) {
-                System.out.println("Redeployer ? (o/n)");
+            int cpt2 = 0;
+            int cpt1 = 0;
+            for (int j = 0; j < survivors.size() + cpt2; j++) {
+                System.out.println("Voici les survivants :");
+                Combattant.affComb(survivors);
+                System.out.println("Redeployer " + Arrays.toString(survivors.get(cpt1).getStats()) + " ? (o/n)");
                 String t = Utils.scan.nextLine();
                 if (t.equals("o")) {
-                    System.out.println("Saisir la zone et la strategie pour le combattant :" + Arrays.toString(survivors.get(0).getStats()));
+                    System.out.println("Saisir la zone et la strategie pour le combattant :");
                     String[] input = Utils.scan.nextLine().split("/");
-                    survivors.get(0).setStrategie(input[1]);
+                    System.out.println("Strategie : " + survivors.get(cpt1).getStrategie());
+                    survivors.get(cpt1).setStrategie(input[1]);
+                    System.out.println("Strategie : " + survivors.get(cpt1).getStrategie());
                     if (NbPlayer == 1) {
-                        zones.get(Integer.parseInt(input[0]) - 1).combattantP1.add(survivors.get(0));
+                        destZones.get(Integer.parseInt(input[0]) - 1).combattantP1.add(survivors.get(cpt1));
                     } else {
-                        zones.get(Integer.parseInt(input[0]) - 1).combattantP2.add(survivors.get(0));
+                        destZones.get(Integer.parseInt(input[0]) - 1).combattantP2.add(survivors.get(cpt1));
                     }
                     survivors.remove(0);
                     cpt2++;
+                } else {
+                    cpt1++;
                 }
             }
         } else {
@@ -234,6 +238,7 @@ public class Partie {
 
 
     }
+
 
     public void autoRes(int nbPlayer) {
 
