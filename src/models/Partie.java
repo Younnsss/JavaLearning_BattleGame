@@ -8,6 +8,31 @@ public class Partie {
     private Player[] players = new Player[2];
     private Zone[] zones = new Zone[5];
 
+    private HashMap<Player,Integer> results;
+
+    public HashMap<Player,Integer> getResults() {
+        return results;
+    }
+
+    public void setResults() {
+        results = new HashMap<Player,Integer>();
+        int score;
+        for (Player p : players) {
+            score = 0;
+            for (Zone z : zones) {
+                if (z.getPWinner().getPseudo() == p.getPseudo()) {
+                    score++;
+                }
+            }
+            results.put(p,score);
+        }
+        if(results.get(players[0]) > results.get(players[1])) {
+            players[0].setWinner(true);
+        } else{
+            players[1].setWinner(true);
+        }
+    }
+
     public Zone[] getZones() {
         return this.zones;
     }

@@ -74,7 +74,7 @@ public class Main {
 			} else {
 				zone.setWinner(game.getPlayers()[0]);
 			}
-			Utils.broadcast("---------- "+ zone.getWinner().getPseudo() +" a gagné la Bataille ! ----------");
+			Utils.broadcast("---------- "+ zone.getPWinner().getPseudo() +" a gagné la Bataille ! ----------");
 
 
 			if(i < game.getZones().length-1 ) {
@@ -92,6 +92,25 @@ public class Main {
 			}
 
 		}
+
+		Utils.broadcast("------------------------- FIN DE LA PARTIE -------------------------");
+		game.setResults();
+		for (Zone zone : game.getZones()) {
+			Utils.broadcast("--------------- Zone de combat : " +zone.getName() +" ---------------");
+			Utils.broadcast(" Le gagnant est : "+ zone.getPWinner().getPseudo());
+		}
+		for (int j = 1; j < 3; j++) {
+			Utils.broadcast("---------- "+ game.getPlayers()[j-1].getPseudo() +" ----------");
+			Utils.broadcast(" Nombre de zones conquises :  " + game.getResults().get(game.getPlayers()[j-1]));
+			if(game.getPlayers()[j-1].getWinner()){
+				Utils.broadcast(" Le joueur "+ game.getPlayers()[j-1].getPseudo() +" a gagné la partie !");
+			}else{
+				Utils.broadcast(" Le joueur "+ game.getPlayers()[j-1].getPseudo() +" a perdu la partie !");
+			}
+		}
+
+
+
     	
         
     }

@@ -11,14 +11,14 @@ public class Zone {
     public List<Combattant> combattantP1 = new ArrayList<Combattant> ();
     public List<Combattant> combattantP2 = new ArrayList<Combattant> ();
 
-	private Player winner;
+	private Player Pwinner;
 
     Zone(String n) {
 		this.name = n;
 		this.isFinish = null;
 	}
-	public Player getWinner() { return this.winner; }
-	public void setWinner(Player player) { this.winner=player; }
+	public Player getPWinner() { return this.Pwinner; }
+	public void setWinner(Player player) { this.Pwinner=player; }
 	public String getName() { return this.name; }
 	public Boolean getIsFinish() { return this.isFinish; }
 

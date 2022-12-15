@@ -176,7 +176,7 @@ public class Combattant implements Comparable<Combattant>{
 		if(nbCombattant==0) {r=Role.maitreGobi;}
 		else if(nbCombattant<5) {r=Role.elite;}
 		else {r=Role.basique;}
-		String[] s = {"a", "h", "r"};
+		String[] s = {"a", "s", "r"};
     	int[] stats = r.getStats();
     	int random;
     	int max;
