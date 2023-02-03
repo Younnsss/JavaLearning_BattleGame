@@ -8,30 +8,6 @@ public class Partie {
     private Player[] players = new Player[2];
     private Zone[] zones = new Zone[5];
 
-    private HashMap<Player,Integer> results;
-
-    public HashMap<Player,Integer> getResults() {
-        return results;
-    }
-
-    public void setResults() {
-        results = new HashMap<Player,Integer>();
-        int score;
-        for (Player p : players) {
-            score = 0;
-            for (Zone z : zones) {
-                if (z.getPWinner().getPseudo() == p.getPseudo()) {
-                    score++;
-                }
-            }
-            results.put(p,score);
-        }
-        if(results.get(players[0]) > results.get(players[1])) {
-            players[0].setWinner(true);
-        } else{
-            players[1].setWinner(true);
-        }
-    }
 
     public Zone[] getZones() {
         return this.zones;
@@ -44,6 +20,124 @@ public class Partie {
     public Player[] getPlayers() {
         return this.players;
     }
+
+    public void iniPartie(){
+        Utils.broadcast("------------------- INITIALISATION -------------------");
+        String choice;
+
+        this.initZones(new String[] {"Bibliothèque", "Bureau des Etudiants",
+                "Quartier administratif", "Halle indistrielle", "Halle sportive"});
+
+        String[] choices = {"random", "manual"};
+        for (int i = 0; i < 2; i++) {
+            Utils.broadcast("--------------- Joueur "+ (i+1) +" ---------------");
+
+            do {
+                choice = Utils.input("Sélectionne une méthode de création de combat: (random/manual)");
+            } while (!Utils.in(choice, choices));
+
+            switch (choice) {
+                case "random":
+                    this.initAutoPlayer(i);
+                    this.initAutoComb(i);
+                    break;
+                default:
+                    this.initPlayer(i);
+                    this.initComb(i);
+                    break;
+            }
+        }
+    }
+
+    public void depPartie(){
+        String choice;
+        String[] choices = {"random", "manual"};
+        Utils.broadcast("------------------- DEPLOIEMENT DE TROUPES -------------------");
+        for (int i = 0; i < 2; i++) {
+
+            do {
+                choice = Utils.input("Sélectionne une méthode de création de combat: (random/manual)");
+            } while (!Utils.in(choice, choices));
+
+            switch (choice) {
+                case "random":
+                    Utils.broadcast("--------------- "+ this.getPlayers()[i].getPseudo() +" ---------------");
+                    this.autoRes(i);
+                    this.autoDep(i);
+                    break;
+                default:
+                    Utils.broadcast("--------------- "+ this.getPlayers()[i].getPseudo() +" ---------------");
+                    this.choixRes(i);
+                    this.depComb(i);
+                    break;
+            }
+
+        }
+    }
+
+    public void battlePartie(){
+        Utils.broadcast("------------------------- COMBAT -------------------------");
+        while (this.getPlayers()[0].getScore()< 3 && this.getPlayers()[1].getScore() < 3) {
+
+            Zone zone = this.getZone(this.chooseZone());
+            Utils.broadcast("--------------- Zone de combat : " +zone.getName() +" ---------------");
+            zone.combat();
+            Utils.broadcast("------------------------- FIN COMBAT : "+zone.getName()+" -------------------------");
+            if(zone.combattantP1.size() == 0) {
+                zone.setWinner(this.getPlayers()[1]);
+                this.getPlayers()[1].updateScore();
+            } else {
+                zone.setWinner(this.getPlayers()[0]);
+                this.getPlayers()[0].updateScore();
+            }
+            Utils.broadcast("---------- "+ zone.getPWinner().getPseudo() +" a gagné la Bataille ! ----------");
+
+
+            if(this.getPlayers()[0].getScore()< 3 && this.getPlayers()[1].getScore() < 3) {
+
+                Utils.broadcast("------------------- REDEPLOIEMENT DE TROUPES -------------------");
+                List<Zone> destZones = this.getDestZones();
+                for (int j = 1; j < 3; j++) {
+                    Utils.broadcast("---------- "+ this.getPlayers()[j-1].getPseudo() +" ----------");
+                    Utils.broadcast(" Deploiement des survivants : ");
+                    this.redeploy(zone,destZones, j);
+                    Utils.broadcast(" Deploiement des reservistes : ");
+                    this.depRes(j,destZones);
+                }
+
+            }
+
+        }
+    }
+
+    public void endPartie(){
+        Utils.broadcast("------------------------- FIN DE LA PARTIE -------------------------");
+        for (Zone zone : this.getZones()) {
+            if(zone.getPWinner() != null) {
+                Utils.broadcast("--------------- Zone de combat : " + zone.getName() + " ---------------");
+                Utils.broadcast(" Le gagnant est : " + zone.getPWinner().getPseudo());
+            }
+        }
+        for (int j = 0; j < 2; j++) {
+            Utils.broadcast("---------- "+ this.getPlayers()[j].getPseudo() +" ----------");
+            Utils.broadcast(" Nombre de zones conquises :  " + this.getPlayers()[j].getScore());
+            if(this.getPlayers()[j].getScore()<this.getPlayers()[1-j].getScore()){
+                Utils.broadcast(" Le joueur "+ this.getPlayers()[j].getPseudo() +" a perdu la partie !");
+            }else{
+                Utils.broadcast(" Le joueur "+ this.getPlayers()[j].getPseudo() +" a gagné la partie !");
+            }
+        }
+    }
+
+    public void launch(){
+        this.iniPartie();
+        this.depPartie();
+        this.battlePartie();
+        this.endPartie();
+    }
+
+
+
 
     public List<Zone> getDestZones() {
         List<Zone> destZones = new ArrayList<Zone>();

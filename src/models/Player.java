@@ -6,7 +6,7 @@ public class Player {
 	
     private String pseudo,filiere;
     private int creditECTS;
-    private boolean winner;
+    private int score;
     private List<Combattant> combattant = new ArrayList<Combattant> ();
     public List<Combattant> reserviste = new ArrayList<Combattant> ();
     
@@ -14,7 +14,7 @@ public class Player {
     	this.pseudo = pseudo;
     	this.filiere = filiere;
     	this.creditECTS = 400;
-        this.winner = false;
+        this.score = 0;
     }
 
     public String getPseudo() {
@@ -47,14 +47,14 @@ public class Player {
         this.filiere = value;
     }
 
-    public boolean getWinner() {
+    public int getScore() {
         // Automatically generated method. Please delete this comment before entering specific code.
-        return this.winner;
+        return this.score;
     }
 
-    void setWinner(boolean value) {
+    public void updateScore() {
         // Automatically generated method. Please delete this comment before entering specific code.
-        this.winner = value;
+        this.score++;
     }
 
     List<Combattant> getCombattant() {
